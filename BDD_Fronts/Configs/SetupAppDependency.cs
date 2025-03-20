@@ -1,4 +1,5 @@
 ﻿using BDD_Fronts.Adapters;
+using BDD_Fronts.Controllers.Products;
 using BDD_Fronts.Models.Categories;
 using BDD_Fronts.Models.Products;
 using Exercise.Applications.Impls;
@@ -94,5 +95,7 @@ public static class SetupAppDependency
         services.AddScoped<ICategoryAdapter<CategoryViewModel>, CategoryViewModelAdapter>();
         services.AddScoped<IProductAdapter<ProductViewModel>, ProductViewModelAdapter>();
         services.AddScoped<IProductAdapter<RegisterViewModel>, RegisterViewModelAdapter>();
+        // ヘルパークラスの依存定義
+        services.AddScoped<ProductRegisterHelper>();
     }
 }

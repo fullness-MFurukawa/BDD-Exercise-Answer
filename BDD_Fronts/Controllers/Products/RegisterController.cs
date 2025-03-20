@@ -1,10 +1,7 @@
 ﻿using BDD_Fronts.Extensions;
 using BDD_Fronts.Models.Categories;
 using BDD_Fronts.Models.Products;
-using Exercise.Applications.Services;
 using Exercise.Domains.Exceptions;
-using Exercise.Domains.Models.Categories;
-using Exercise.Domains.Models.Products;
 using Microsoft.AspNetCore.Mvc;
 namespace BDD_Fronts.Controllers.Products;
 /// <summary>
@@ -14,26 +11,19 @@ namespace BDD_Fronts.Controllers.Products;
 [Route("exercise/product/register")]
 public class RegisterController : Controller
 {
-    private readonly IProductRegisterService _productRegisterService;
-    private readonly ICategoryAdapter<CategoryViewModel> _categoryAdapter;
-    private readonly IProductAdapter<RegisterViewModel> _productAdapter;
+    private readonly ProductRegisterHelper _helper;
     private readonly ILogger<RegisterController> _logger;
+
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    /// <param name="productRegisterService">商品登録サービス</param>
-    /// <param name="categoryAdapter">CategoryとCategoryViewModelの相互変換</param>
-    /// <param name="productAdapter">ProductとRegisterViewModelの相互変換</param>
+    /// <param name="helper">商品登録コントローラ用ヘルパ</param>
     /// <param name="logger">ロガー</param>
     public RegisterController(
-        IProductRegisterService productRegisterService,
-        ICategoryAdapter<CategoryViewModel> categoryAdapter,
-        IProductAdapter<RegisterViewModel> productAdapter,
+        ProductRegisterHelper helper, 
         ILogger<RegisterController> logger)
     {
-        _productRegisterService = productRegisterService;
-        _categoryAdapter = categoryAdapter;
-        _productAdapter = productAdapter;
+        _helper = helper;
         _logger = logger;
     }
 
@@ -45,15 +35,12 @@ public class RegisterController : Controller
     public IActionResult Enter()
     {
         // 商品登録ビューモデルを生成する
-        var model = new RegisterViewModel();
-        // 登録サービスからカテゴリリストを取得する
-        var categories = _productRegisterService.GetCategories();
-        // ビューモデルのCategriesにカテゴリビューモデルに変換したリストを格納する
-        model.Categories = _categoryAdapter.ConvertList(categories);
+        var model = this._helper.CreateRegisterViewModel();
         // セッションのカテゴリビューモデルのリストを格納する
         HttpContext.Session.SetObject("Categories", model.Categories);
         return View(model);
     }
+
     /// <summary>
     /// 入力画面のボタンクリックハンドラ
     /// </summary>
@@ -75,7 +62,7 @@ public class RegisterController : Controller
             try
             {
                 // 既に商品が登録済みかを確認する
-                _productRegisterService.Exists(new ProductName(model.ProductName!));
+                this._helper.Exists(model);
             }
             catch (ExistsException e) // 登録済み例外
             {
@@ -87,12 +74,8 @@ public class RegisterController : Controller
                 // 入力画面に遷移する
                 return View("Enter", model);
             }
-
-            // カテゴリIdを取得する
-            var id = new CategoryId(model.CategoryId!);
-            // カテゴリIdでカテゴリ情報を取得する
-            var category = _productRegisterService.GetCategory(id);
-            model.CategoryName = category.Name.Value;
+            // カテゴリIdで商品カテゴリを取得してRegisterViewModelに格納する
+            _helper.GetCategoryById(model);
             // TempDataにModelを格納する
             TempData.SetObject("registerViewModel", model);
             // CompleteActionにリダイレクトする(PRGパターン)
@@ -106,6 +89,7 @@ public class RegisterController : Controller
             return View("Enter", model);
         }
     }
+
     /// <summary>
     /// 商品登録完了
     /// </summary>
@@ -115,13 +99,12 @@ public class RegisterController : Controller
     {
         // TempDataから商品登録ビューモデルを取得する
         var model = TempData.GetObject<RegisterViewModel>("registerViewModel");
-        // 商品登録用のドメインオブジェクトを作成する
-        var product = _productAdapter.Restore(model!);
-        // 商品を永続化する
-        _productRegisterService.Register(product);
+        // 商品を登録する 
+        _helper.Register(model!);
         // 登録完了画面に遷移する
         return View("Complete", model);
     }
+
     /// <summary>
     /// [終了]ボタンクリックハンドラ
     /// </summary>
