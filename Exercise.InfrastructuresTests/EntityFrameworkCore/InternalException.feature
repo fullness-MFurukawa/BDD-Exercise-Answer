@@ -1,0 +1,44 @@
+﻿@InternalException
+Feature: InternalException
+#
+# このFeatureは、InternalExceptionがスローされることを目的とする
+#
+
+Background: 
+    Given ダミーのDbContextを利用するリポジトリを取得する
+
+#
+# ICategoryRepositoryインターフェイスのメソッドに対するInternalExceptionテスト 
+#
+Scenario: 商品カテゴリIdで商品カテゴリを取得する際予期しない例外が発⽣した場合、InternalExceptionがスローされることを検証する
+	When CategoryRepositoryのFindByIdメソッドを実行する
+	Then InternalExceptionがスローされたことを評価する
+Scenario: 商品カテゴリを取得する際予期しない例外が発⽣した場合、InternalExceptionがスローされることを検証する
+	When CategoryRepositoryのFindAllメソッドを実行する
+	Then InternalExceptionがスローされたことを評価する
+
+#
+# IProductRepositoryインターフェイスの参照系メソッドに対するInternalExceptionテスト 
+#
+Scenario: 商品Idで商品を取得する際、予期しない例外が発生した場合、InternalExceptionがスローされることを検証する
+	When ProductRepositoryのFindByIdメソッドを実行する
+	Then InternalExceptionがスローされたことを評価する
+Scenario: キーワードで商品を検索する際、予期しない例外が発生した場合、InternalExceptionがスローされることを検証する
+	When ProductRepositoryのFindByNameContainsメソッドを実行する
+	Then InternalExceptionがスローされたことを評価する
+Scenario: 商品名の存在を取得する際、予期しない例外が発生した場合、InternalExceptionがスローされることを検証する
+	When ProductRepositoryのExistsメソッドを実行する
+	Then InternalExceptionがスローされたことを評価する
+
+#
+# IProductRepositoryインターフェイスの更新系メソッドに対するInternalExceptionテスト 
+#
+Scenario: 商品を永続化する際、予期しない例外が発生した場合、InternalExceptionがスローされることを検証する
+	When ProductRepositoryのCreateメソッドを実行する
+	Then InternalExceptionがスローされたことを評価する
+Scenario: 商品を変更する際、予期しない例外が発生した場合、InternalExceptionがスローされることを検証する
+	When ProductRepositoryのUpdateByIdメソッドを実行する
+	Then InternalExceptionがスローされたことを評価する
+Scenario: 商品を削除する際、予期しない例外が発生した場合、InternalExceptionがスローされることを検証する
+	When ProductRepositoryのDeleteByIdメソッドを実行する
+	Then InternalExceptionがスローされたことを評価する

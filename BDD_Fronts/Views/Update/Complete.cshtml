@@ -1,0 +1,28 @@
+﻿@{
+    ViewData["Title"] = "商品変更";
+}
+@model BDD_Fronts.Models.Products.ProductViewModel
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <div align="center">
+                <h2>商品変更</h2>
+                <p>
+                    <h4 id="change-message">以下の商品を変更しました。</h4>
+                    <h4 id="change-details">商品:@Model.ProductName 単価:@Model.ProductPrice</h4>
+                </p>
+            </div>
+            <form asp-action="EndButtonClick" method="post">
+                <div class="row mb-3">
+                    <div class="text-center">
+                        <button type="submit" name="action" value="Search" class="btn btn-success">検索へ</button>
+                        <button type="submit" name="action" value="End" class="btn btn-primary">終了</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+</div>
